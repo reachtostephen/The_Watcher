@@ -1,2 +1,3 @@
 *.cfg
 .idea/
+.ipynb_checkpoints/
