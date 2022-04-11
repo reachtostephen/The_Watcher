@@ -1,18 +1,23 @@
+import os
+
 import scrapy
 
+from dotenv import load_dotenv
+from pathlib import Path
+dotenv_path = Path('/home/stephenraj/PycharmProjects/The Watcher/.env')
+load_dotenv(dotenv_path=dotenv_path)
 
 class WatcherSpiderSpider(scrapy.Spider):
-    name = 'watcher_spider'
-    allowed_domains = ['economictimes.indiatimes.com']
-    start_urls = ['http://economictimes.indiatimes.com/']
+    name = os.getenv('spider_name')
+    allowed_domains = os.getenv('domain')
+    start_urls = [os.getenv('start_url')]
 
     def parse(self, response):
-        company_names = ['reliance-industries-ltd', 'hdfc-bank-ltd', 'bajaj-finance-ltd', 'bharti-airtel-ltd',
-                         'adani-enterprises-ltd']
-        company_codes = [13215, 9195, 11260, 2718, 9074]
+        company_names = [i.strip() for i in os.getenv('company_names').split(',')]
+        company_codes = [int(i) for i in os.getenv('company_codes').split(',')]
         for i in range(len(company_names)):
             yield response.follow(
-                f"https://economictimes.indiatimes.com/{company_names[i]}/stocks/companyid-{company_codes[i]}.cms",
+                f"{os.getenv('start_url')}/{company_names[i]}/stocks/companyid-{company_codes[i]}.cms",
                 callback=self.parse_company, dont_filter=True,
                 meta={'company_name': company_names[i], 'company_code': company_codes[i]})
 
