@@ -34,7 +34,7 @@ class WatcherSpiderSpider(scrapy.Spider):
 
     def parse_table(self, response):
         tables = response.meta.get('tables')
-        scraped_tables = ['income-quaterly', 'income-annual', 'balance-sheet', 'cash-flow', 'ratios']
+        scraped_tables = ['income_quaterly', 'income_annual', 'balance_sheet', 'cash_flow', 'ratios']
         for i in range(len(tables)):
             for columns in tables[i].xpath('.//thead/tr'):
                 column_names = columns.xpath('th[re:test(@class,"tb_col_\d$")]/text()').extract()
