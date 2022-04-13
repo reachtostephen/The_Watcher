@@ -1,10 +1,16 @@
 import scrapy
 import os
 
+import sys
+
+# insert at 1, 0 is the script path (or '' in REPL)
+from ..items import NseCrawlItem
 from dotenv import load_dotenv
 from pathlib import Path
+
 dotenv_path = Path('/home/stephenraj/PycharmProjects/The Watcher/.env')
 load_dotenv(dotenv_path=dotenv_path)
+
 
 class NseSpider(scrapy.Spider):
     name = os.getenv('nse_name')
@@ -23,8 +29,7 @@ class NseSpider(scrapy.Spider):
             if company_names[i] == '':
                 company_names[i] = company_names_missed[j]
                 j += 1
-            yield {
-                'symbol': symbols[i],
-                'company': company_names[i]
-            }
-
+            item = NseCrawlItem()
+            item['symbol'] = symbols[i]
+            item['company'] = company_names[i]
+            yield item

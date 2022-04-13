@@ -1,11 +1,13 @@
 import os
-
 import scrapy
 
+from ..items import FirstItem, SecondItem
 from dotenv import load_dotenv
 from pathlib import Path
+
 dotenv_path = Path('/home/stephenraj/PycharmProjects/The Watcher/.env')
 load_dotenv(dotenv_path=dotenv_path)
+
 
 class WatcherSpiderSpider(scrapy.Spider):
     name = os.getenv('spider_name')
@@ -45,14 +47,14 @@ class WatcherSpiderSpider(scrapy.Spider):
                     values2 = row.xpath("td/span/text()").extract()
                     values.extend(values2)
                 compiled_values.append(values)
-            yield {
-                'company_name': response.meta.get('company_name'),
+
+            item = {
                 'company_code': response.meta.get('company_code'),
-                'company_sector': response.meta.get('company_sector'),
-                'company_industry': response.meta.get('company_industry'),
                 'scraped_table': scraped_tables[i],
-                'records': {
-                    'columns': column_names,
-                    'values': compiled_values
-                }
+                'columns': column_names,
+                'values': compiled_values,
+                'company_name': response.meta.get('company_name'),
+                'company_sector': response.meta.get('company_sector'),
+                'company_industry': response.meta.get('company_industry')
             }
+            yield item
