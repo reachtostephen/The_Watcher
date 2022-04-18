@@ -1,7 +1,6 @@
 import os
 import scrapy
 
-from ..items import FirstItem, SecondItem
 from dotenv import load_dotenv
 from pathlib import Path
 
@@ -26,7 +25,6 @@ class WatcherSpiderSpider(scrapy.Spider):
     def parse_company(self, response):
         company_sector, company_industry = response.css("li::attr(title)").extract()
         tables = response.xpath("//table[contains(@class,'table consolidated')]")
-        # self.logger.info(columns)
         yield response.follow(response.url, callback=self.parse_table, meta={
             'tables': tables, 'company_sector': company_sector, 'company_industry': company_industry,
             'company_name': response.meta.get('company_name'), 'company_code': response.meta.get('company_code')},
