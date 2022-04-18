@@ -1,11 +1,3 @@
-# Define your item pipelines here
-#
-# Don't forget to add your pipeline to the ITEM_PIPELINES setting
-# See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-
-
-# useful for handling different item types with a single interface
-from itemadapter import ItemAdapter
 import pymongo
 import pandas as pd
 from scrapy.utils.project import get_project_settings
@@ -40,3 +32,5 @@ class WatcherCrawlPipeline:
         df2.reset_index(inplace=True)
         df2['company_code'] = item['company_code']
         coll.insert_many(df2.to_dict('records'))
+        for i in coll.find({"company_code": item['company_code']}):
+            self.collection.update_one({'company_code': item['company_code']}, {'$push': {'ref': i['_id']}})
