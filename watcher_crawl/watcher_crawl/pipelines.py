@@ -12,6 +12,7 @@ class WatcherCrawlPipeline:
         )
         self.db = connection[settings.get('MONGODB_DB')]
         self.collection = self.db[settings.get('MONGODB_COLLECTION')]
+        self.ref_coll = self.db[settings.get('COMPILED_COLLECTION')]
 
     def process_item(self, item, spider):
         dict1 = {
@@ -20,9 +21,12 @@ class WatcherCrawlPipeline:
             'company_industry': item['company_industry'],
             'company_sector': item['company_sector']
         }
+
         is_existing = self.collection.find_one(dict1)
         if not is_existing:
             self.collection.insert_one(dict1)
+            self.ref_coll.insert_one({'_id': item['company_code'],
+                                      'company_name': item['company_name']})
 
         coll = self.db[item['scraped_table']]
         coll_names = item['columns']
@@ -33,4 +37,5 @@ class WatcherCrawlPipeline:
         df2['company_code'] = item['company_code']
         coll.insert_many(df2.to_dict('records'))
         for i in coll.find({"company_code": item['company_code']}):
-            self.collection.update_one({'company_code': item['company_code']}, {'$push': {'ref': i['_id']}})
+            self.ref_coll.update_one({'_id': item['company_code']},
+                                     {'$push': {item['scraped_table'] + '_ref': i['_id']}})

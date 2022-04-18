@@ -18,6 +18,7 @@ MONGODB_SERVER = "localhost"
 MONGODB_PORT = 27017
 MONGODB_DB = "The-watcher"
 MONGODB_COLLECTION = 'company_details'
+COMPILED_COLLECTION = 'company_reference'
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 # USER_AGENT = 'watcher_crawl (+http://www.yourdomain.com)'
 
