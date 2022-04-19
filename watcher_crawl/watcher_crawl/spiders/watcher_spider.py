@@ -1,18 +1,23 @@
+import os
+
 import scrapy
 
+from dotenv import load_dotenv
+from pathlib import Path
+dotenv_path = Path('/home/stephenraj/PycharmProjects/The Watcher/.env')
+load_dotenv(dotenv_path=dotenv_path)
 
 class WatcherSpiderSpider(scrapy.Spider):
-    name = 'watcher_spider'
-    allowed_domains = ['economictimes.indiatimes.com']
-    start_urls = ['http://economictimes.indiatimes.com/']
+    name = os.getenv('spider_name')
+    allowed_domains = os.getenv('domain')
+    start_urls = [os.getenv('start_url')]
 
     def parse(self, response):
-        company_names = ['reliance-industries-ltd', 'hdfc-bank-ltd', 'bajaj-finance-ltd', 'bharti-airtel-ltd',
-                         'adani-enterprises-ltd']
-        company_codes = [13215, 9195, 11260, 2718, 9074]
+        company_names = [i.strip() for i in os.getenv('company_names').split(',')]
+        company_codes = [int(i) for i in os.getenv('company_codes').split(',')]
         for i in range(len(company_names)):
             yield response.follow(
-                f"https://economictimes.indiatimes.com/{company_names[i]}/stocks/companyid-{company_codes[i]}.cms",
+                f"{os.getenv('start_url')}/{company_names[i]}/stocks/companyid-{company_codes[i]}.cms",
                 callback=self.parse_company, dont_filter=True,
                 meta={'company_name': company_names[i], 'company_code': company_codes[i]})
 
@@ -27,23 +32,27 @@ class WatcherSpiderSpider(scrapy.Spider):
 
     def parse_table(self, response):
         tables = response.meta.get('tables')
-        for columns in tables[0].xpath('.//thead/tr'):
-            column_names = columns.xpath('th[re:test(@class,"tb_col_\d$")]/text()').extract()
-            column_names = ['fields'] + column_names
-        compiled_values = []
-        for row in tables[0].xpath('.//tbody/tr'):
-            values = row.xpath("td/text()").extract()
-            if len(values) == 1:
-                values2 = row.xpath("td/span/text()").extract()
-                values.extend(values2)
-            compiled_values.append(values)
-        yield {
-            'company_name': response.meta.get('company_name'),
-            'company_code': response.meta.get('company_code'),
-            'company_sector': response.meta.get('company_sector'),
-            'company_industry': response.meta.get('company_industry'),
-            'tables': {
-                'columns': column_names,
-                'values': compiled_values
+        scraped_tables = ['income-quaterly', 'income-annual', 'balance-sheet', 'cash-flow', 'ratios']
+        for i in range(len(tables)):
+            for columns in tables[i].xpath('.//thead/tr'):
+                column_names = columns.xpath('th[re:test(@class,"tb_col_\d$")]/text()').extract()
+                column_names = [i.replace("\n", "").strip() for i in column_names]
+                column_names = ['fields'] + column_names
+            compiled_values = []
+            for row in tables[i].xpath('.//tbody/tr'):
+                values = row.xpath("td/text()").extract()
+                if len(values) == 1:
+                    values2 = row.xpath("td/span/text()").extract()
+                    values.extend(values2)
+                compiled_values.append(values)
+            yield {
+                'company_name': response.meta.get('company_name'),
+                'company_code': response.meta.get('company_code'),
+                'company_sector': response.meta.get('company_sector'),
+                'company_industry': response.meta.get('company_industry'),
+                'scraped_table': scraped_tables[i],
+                'records': {
+                    'columns': column_names,
+                    'values': compiled_values
+                }
             }
-        }
