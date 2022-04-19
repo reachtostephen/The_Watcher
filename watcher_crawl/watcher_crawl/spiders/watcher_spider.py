@@ -27,23 +27,27 @@ class WatcherSpiderSpider(scrapy.Spider):
 
     def parse_table(self, response):
         tables = response.meta.get('tables')
-        for columns in tables[0].xpath('.//thead/tr'):
-            column_names = columns.xpath('th[re:test(@class,"tb_col_\d$")]/text()').extract()
-            column_names = ['fields'] + column_names
-        compiled_values = []
-        for row in tables[0].xpath('.//tbody/tr'):
-            values = row.xpath("td/text()").extract()
-            if len(values) == 1:
-                values2 = row.xpath("td/span/text()").extract()
-                values.extend(values2)
-            compiled_values.append(values)
-        yield {
-            'company_name': response.meta.get('company_name'),
-            'company_code': response.meta.get('company_code'),
-            'company_sector': response.meta.get('company_sector'),
-            'company_industry': response.meta.get('company_industry'),
-            'tables': {
-                'columns': column_names,
-                'values': compiled_values
+        scraped_tables = ['income-quaterly', 'income-annual', 'balance-sheet', 'cash-flow', 'ratios']
+        for i in range(len(tables)):
+            for columns in tables[i].xpath('.//thead/tr'):
+                column_names = columns.xpath('th[re:test(@class,"tb_col_\d$")]/text()').extract()
+                column_names = [i.replace("\n", "").strip() for i in column_names]
+                column_names = ['fields'] + column_names
+            compiled_values = []
+            for row in tables[i].xpath('.//tbody/tr'):
+                values = row.xpath("td/text()").extract()
+                if len(values) == 1:
+                    values2 = row.xpath("td/span/text()").extract()
+                    values.extend(values2)
+                compiled_values.append(values)
+            yield {
+                'company_name': response.meta.get('company_name'),
+                'company_code': response.meta.get('company_code'),
+                'company_sector': response.meta.get('company_sector'),
+                'company_industry': response.meta.get('company_industry'),
+                'scraped_table': scraped_tables[i],
+                'records': {
+                    'columns': column_names,
+                    'values': compiled_values
+                }
             }
-        }
