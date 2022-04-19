@@ -1,0 +1,5 @@
+pandas==1.4.1
+Scrapy==2.6.1
+pymongo==4.1.0
+scrapy==2.6.1
+pip-tools==6.6.0

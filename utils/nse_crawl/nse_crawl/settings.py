@@ -1,4 +1,4 @@
-# Scrapy settings for watcher_crawl project
+# Scrapy settings for nse_crawl project
 #
 # For simplicity, this file contains only settings considered important or
 # commonly used. You can find more settings consulting the documentation:
@@ -7,20 +7,20 @@
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = 'watcher_crawl'
+BOT_NAME = 'nse_crawl'
 
-SPIDER_MODULES = ['watcher_crawl.spiders']
-NEWSPIDER_MODULE = 'watcher_crawl.spiders'
+SPIDER_MODULES = ['nse_crawl.spiders']
+NEWSPIDER_MODULE = 'nse_crawl.spiders'
 
-ITEM_PIPELINES = {'watcher_crawl.pipelines.WatcherCrawlPipeline': 0}
+ITEM_PIPELINES = {'nse_crawl.pipelines.NseCrawlPipeline': 0}
 
 MONGODB_SERVER = "localhost"
 MONGODB_PORT = 27017
 MONGODB_DB = "The-watcher"
-MONGODB_COLLECTION = 'company_details'
-COMPILED_COLLECTION = 'company_reference'
+MONGODB_COLLECTION = "nse_companies"
+
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-# USER_AGENT = 'watcher_crawl (+http://www.yourdomain.com)'
+# USER_AGENT = 'nse_crawl (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
@@ -51,13 +51,13 @@ ROBOTSTXT_OBEY = True
 # Enable or disable spider middlewares
 # See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 # SPIDER_MIDDLEWARES = {
-#    'watcher_crawl.middlewares.WatcherCrawlSpiderMiddleware': 543,
+#    'nse_crawl.middlewares.NseCrawlSpiderMiddleware': 543,
 # }
 
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 # DOWNLOADER_MIDDLEWARES = {
-#    'watcher_crawl.middlewares.WatcherCrawlDownloaderMiddleware': 543,
+#    'nse_crawl.middlewares.NseCrawlDownloaderMiddleware': 543,
 # }
 
 # Enable or disable extensions
@@ -69,7 +69,7 @@ ROBOTSTXT_OBEY = True
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 # ITEM_PIPELINES = {
-#    'watcher_crawl.pipelines.WatcherCrawlPipeline': 300,
+#    'nse_crawl.pipelines.NseCrawlPipeline': 300,
 # }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
